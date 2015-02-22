@@ -1,3 +1,5 @@
+#pragma once
+
 #include <vector>
 #include <fstream>
 #include <stack>
@@ -128,7 +130,3 @@ private:
     std::vector<node_handle> from;
     std::vector<node_handle> to;
 };
-
-int main() {
-
-}
