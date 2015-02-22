@@ -55,13 +55,13 @@ public:
 	}
 
 	bigint(bigint const& bi)
-		: values(bi.values)
-		, sign(bi.sign)
+		: sign(bi.sign)
+		, values(bi.values)
 	{}
 
 	bigint(bigint && bi)
-		: values(std::move(bi.values))
-		, sign(bi.sign)
+		: sign(bi.sign)
+		, values(std::move(bi.values))
 	{}
 
 	bigint& operator=(bigint bi) {
