@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.11)
 
 project(cpp-tasks)
 
@@ -11,3 +11,4 @@ include_directories(include ${Boost_INCLUDE_DIR})
 
 add_subdirectory(include)
 add_subdirectory(test)
+add_subdirectory(chat)
