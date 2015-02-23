@@ -32,6 +32,8 @@ private slots:
 
 private:
     QString nickname;
+    QString userId;
+
     QScopedPointer<QUdpSocket> socket;
     QMap<QString, QString> users;
 

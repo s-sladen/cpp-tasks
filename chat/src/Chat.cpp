@@ -1,5 +1,6 @@
 #include "Chat.h"
 
+#include <QUuid>
 #include <stdexcept>
 
 enum class MessageType : char {
@@ -15,6 +16,7 @@ Chat::~Chat() {
     if (socket) {
         QByteArray message;
         message.append(static_cast<char>(MessageType::DISCONNECT));
+        message.append(userId);
         socket->writeDatagram(message, QHostAddress::Broadcast, PORT);
     }
 }
@@ -25,6 +27,8 @@ QString Chat::getNickname() {
 
 void Chat::login(QString nickname) {
     this->nickname = nickname;
+    this->userId = QUuid::createUuid().toString();
+
     socket.reset(new QUdpSocket(this));
     if (!socket->bind(PORT, QUdpSocket::ReuseAddressHint)) {
         throw std::runtime_error("cannot bind port");
@@ -33,29 +37,29 @@ void Chat::login(QString nickname) {
 
     QByteArray message;
     message.append(static_cast<char>(MessageType::CONNECT));
-    message.append(nickname);
+    message.append(userId).append(':').append(nickname);
     socket->writeDatagram(message, QHostAddress::Broadcast, PORT);
 }
 
 void Chat::readMessages() {
     while (socket->hasPendingDatagrams()) {
         QByteArray buffer(socket->pendingDatagramSize(), 0);
-        QHostAddress fromAddress;
-        quint16 fromPort;
-        socket->readDatagram(buffer.data(), buffer.size(), &fromAddress, &fromPort);
-        QString from = fromAddress.toString() + ":" + fromPort;
+        socket->readDatagram(buffer.data(), buffer.size(), nullptr, nullptr);
         MessageType type = static_cast<MessageType>(buffer.at(0));
         QString data = QString::fromUtf8(buffer.data() + 1, buffer.size() - 1);
+        int colon = data.indexOf(':');
+        QString from = data.left(colon);
+        QString message = data.right(data.length() - colon - 1);
         switch (type) {
             case MessageType::CONNECT:
-                emit loggedIn(data);
+                emit loggedIn(message);
                 buffer.clear();
                 buffer.append(static_cast<char>(MessageType::I_AM_HERE));
-                buffer.append(nickname);
+                buffer.append(userId).append(':').append(nickname);
                 socket->writeDatagram(buffer, QHostAddress::Broadcast, PORT);
                 break;
             case MessageType::MESSAGE:
-                emit messageCame(users[from], data);
+                emit messageCame(users[from], message);
                 break;
             case MessageType::DISCONNECT:
                 emit loggedOut(users[from]);
@@ -63,7 +67,7 @@ void Chat::readMessages() {
                 emit refreshUsers();
                 break;
             case MessageType::I_AM_HERE:
-                users[from] = data;
+                users[from] = message;
                 emit refreshUsers();
                 break;
         }
@@ -73,7 +77,7 @@ void Chat::readMessages() {
 void Chat::sendMessage(QString message) {
     QByteArray buffer;
     buffer.append(static_cast<char>(MessageType::MESSAGE));
-    buffer.append(message);
+    buffer.append(userId).append(':').append(message);
     socket->writeDatagram(buffer, QHostAddress::Broadcast, PORT);
 }
 
