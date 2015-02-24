@@ -10,5 +10,6 @@ find_package(Boost REQUIRED)
 include_directories(include ${Boost_INCLUDE_DIR})
 
 add_subdirectory(include)
+add_subdirectory(src)
 add_subdirectory(test)
 add_subdirectory(chat)
