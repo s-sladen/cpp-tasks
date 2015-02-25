@@ -5,16 +5,36 @@
 #include <stack>
 #include <algorithm>
 
+/**
+* Oriented graph with values on each node of given type
+* @tparam T type of values on nodes
+*/
 template<typename T>
 class graph_t {
 public:
     typedef size_t node_handle;
     typedef size_t edge_handle;
 
+    /**
+    * Constructs empty graph
+    */
     graph_t() = default;
-    graph_t(graph_t const&) = default;
+
+    /**
+    * Copies existing graph
+    * @param graph value to copy
+    */
+    graph_t(graph_t const& graph) = default;
+
+    /**
+    * Default destructor
+    */
     ~graph_t() = default;
 
+    /**
+    * Move constructor
+    * @param origin value to move
+    */
     graph_t(graph_t && origin)
         : nodes(std::move(origin.nodes))
         , payloads(std::move(origin.payloads))
@@ -22,6 +42,11 @@ public:
         , to(std::move(origin.to))
     {}
 
+    /**
+    * Assigns existing graph
+    * @param graph value to assign
+    * @return this
+    */
     graph_t& operator=(graph_t graph) {
         std::swap(nodes, graph.nodes);
         std::swap(payloads, graph.payloads);
@@ -30,6 +55,11 @@ public:
         return *this;
     }
 
+    /**
+    * Checks if this graph is equal to given
+    * @param graph value to compare with
+    * @return true if this == graph, false othrewise
+    */
     bool operator==(graph_t const& graph) const {
         return nodes == graph.nodes
                 && payloads == graph.payloads
@@ -37,10 +67,19 @@ public:
                 && to == graph.to;
     }
 
+    /**
+    * Checks if this graph is not equal to given
+    * @param graph value to compare with
+    * @return true if this != graph, false othrewise
+    */
     bool operator!=(graph_t const& graph) const {
         return !(*this == graph);
     }
 
+    /**
+    * Loads graph from file with given name to this instance discarding any existing data in this instance.
+    * @param filename to load graph data from
+    */
     void load_from_file(std::string const& filename) {
         std::ifstream in(filename.c_str());
 
@@ -63,6 +102,10 @@ public:
         }
     }
 
+    /**
+    * Saves graph data to file with given name.
+    * @param filename to load graph data from
+    */
     void save_to_file(std::string const& filename) const {
         std::ofstream out(filename.c_str());
 
@@ -78,12 +121,22 @@ public:
         }
     }
 
+    /**
+    * Creates new node and returns it's handle
+    * @return handle to the newly created node
+    */
     node_handle add_node() {
         nodes.resize(nodes.size() + 1);
         payloads.resize(payloads.size() + 1);
         return nodes.size() - 1;
     }
 
+    /**
+    * Adds new edges with given ends and returns it's handle
+    * @param a start node handle
+    * @param b end node handle
+    * @return handle to the newly created edge
+    */
     edge_handle add_edge(node_handle const& a, node_handle const& b) {
         from.push_back(a);
         to.push_back(b);
@@ -92,32 +145,69 @@ public:
         return edge;
     }
 
+    /**
+    * Execute given visitor on each node of this graph.
+    * @tparam NodeVisitor type of node visitor
+    * @param visitor to execute
+    */
     template<typename NodeVisitor>
     void for_each_node(NodeVisitor visitor) const {
         for (node_handle node = 0; node < nodes.size(); ++node)
             visitor(node);
     }
 
+    /**
+    * Returns number of nodes in this graph
+    * @return numver of nodes in this graph
+    */
     size_t get_nodes_count() const {
         return nodes.size();
     }
 
+    /**
+    * Executes given visitor on each edge starting at the given node.
+    * @param source node
+    * @param visitor to execute
+    * @tparam EdgeVisitor type of visitor
+    */
     template<typename EdgeVisitor>
     void for_each_edge(node_handle const& source, EdgeVisitor visitor) {
         for (edge_handle edge : nodes[source])
             visitor(edge);
     }
 
+    /**
+    * Returns end node of given edge if it's start matches given origin
+    * @param origin start of edge
+    * @param edge to move along
+    * @throws std::runtime_error if given edge does not start at the given node
+    */
     node_handle move(node_handle const& origin, edge_handle const& edge) {
         if (from[edge] != origin)
             throw std::runtime_error("given edge doesn't start at the given origin");
         return to[edge];
     }
 
+    /**
+    * Returns reference to the value on given node
+    * @param node
+    * @return reference to the value on given node
+    */
     T & operator[](node_handle const& node) {
         return payloads[node];
     }
 
+    /**
+    * Depth first search. Visits each node and each edge which are reachable from given start node.
+    * @param start_node node to start dfs from
+    * @param start_visitor to execute when algorithm enters a node
+    * @param end_visitor to execute when algorithm leaves a node
+    * @param discover_visitor to execute when algorithm discovers a node
+    * @tparam StartVisitor type of start_visitor
+    * @tparam EndVisitor type of end_visitor
+    * @tparam DiscoverVisitor type of discover_visitor
+    * @see http://en.wikipedia.org/wiki/Depth-first_search
+    */
     template<typename StartVisitor, typename EndVisitor, typename DiscoverVisitor>
     void dfs(node_handle start_node, StartVisitor start_visitor, EndVisitor end_visitor, DiscoverVisitor discover_visitor) {
         if (nodes.empty())
