@@ -1,7 +1,7 @@
 project(chat)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH}:/usr/local/opt/qt5)
+    set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH};/usr/local/opt/qt5)
 endif()
 
 set(CMAKE_AUTOMOC ON)
