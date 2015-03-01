@@ -3,6 +3,7 @@
 #include <iostream>
 #include <atomic>
 #include <thread>
+#include <mutex>
 
 /**
 * Thread-safe reference counting pointer wrapper.

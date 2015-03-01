@@ -61,8 +61,8 @@ BOOST_AUTO_TEST_CASE(smart_ptr_multithread_counting)
 		});
 		thread_a.join();
 		thread_b.join();
-		BOOST_CHECK(counter_a == 1 && counter_b == 0 
-			|| counter_a == 0 && counter_b == 1 
-			|| counter_a == 0 && counter_b == 0);
+		BOOST_CHECK((counter_a == 1 && counter_b == 0)
+		 	|| (counter_a == 0 && counter_b == 1)
+		 	|| (counter_a == 0 && counter_b == 0));
 	}
 }

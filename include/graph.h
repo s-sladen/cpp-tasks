@@ -92,7 +92,7 @@ public:
             in >> payloads[i];
         }
 
-        nodes.assign(n, {});
+        nodes.assign(n, std::vector<edge_handle>());
         from.assign(m, 0);
         to.assign(m, 0);
 
