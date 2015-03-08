@@ -1,5 +1,7 @@
 #include <poker/deck.h>
 
+#include <algorithm>
+
 namespace poker {
     deck_t::deck_t() {
         for (size_t suit = card_suit::CLUBS; suit <= card_suit::SPADES; ++suit)

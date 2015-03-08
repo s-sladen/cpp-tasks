@@ -1,6 +1,8 @@
 #include <poker/rules.h>
 
 #include <numeric>
+#include <algorithm>
+#include <stdexcept>
 
 namespace poker {
     namespace {

@@ -1,5 +1,7 @@
 #include <poker/hand.h>
 
+#include <stdexcept>
+
 namespace poker {
     hand_t::hand_t(uint32_t cash)
             : cards()

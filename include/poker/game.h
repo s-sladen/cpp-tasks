@@ -2,6 +2,9 @@
 
 #include <numeric>
 #include <iostream>
+#include <memory>
+#include <stdexcept>
+#include <iterator>
 
 #include "card.h"
 #include "player.h"

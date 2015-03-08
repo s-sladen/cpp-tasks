@@ -1,6 +1,8 @@
 #include <poker/human.h>
 
 #include <iostream>
+#include <algorithm>
+#include <iterator>
 
 namespace poker {
     human_player_t::human_player_t(std::string name)
